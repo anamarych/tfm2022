@@ -25,42 +25,44 @@ def read_serial(serial):
     
     while 1:
         buffer = serial.read_until(expected=b'\r\n')
-        print(buffer)
         f_data = format_sensor(buffer)
-        print(f_data)
     
 def format_sensor(data):
-    now = datetime.datetime.now()
-    mota = int.from_bytes(data[1:4], "big")
-    x = {
-        "id_concentrador": "000FF001", #se puede cambiar este ID para identificar a la raspberry
-        "time" : str(now.strftime('%Y%m%d_%H%M%S')),
-        "id_mota": mota
+    now = datetime.datetime.now().isoformat()
+    mota = str(int.from_bytes(data[1:4], "big"))
+    document = {
+        "time" : now,
+        "class": "4405",
+        "hub": "000FF001",
+        "node": mota
         }
+    x = {}
     
     total_sensores = data[4]  
     # la data de los sensores se presentan cada 5 bytes en la trama
 
     for i in range(5,len(data),5):
         if data[i] == 0:
-            x["room_temp"] = "{:.2f}".format(struct.unpack('f', data[11:15])[0])
+            x["room_temp"] = float("{:.2f}".format(struct.unpack('f', data[11:15])[0]))
         elif data[i] == 1:
-            x["humidity"] = "{:.2f}".format(struct.unpack('f', data[6:10])[0])
+            x["humidity"] = float("{:.2f}".format(struct.unpack('f', data[6:10])[0]))
         elif data[i] == 2:
-            x["luminosity"] = "{:.2f}".format(struct.unpack('f', data[16:20])[0])
+            x["luminosity"] = float("{:.2f}".format(struct.unpack('f', data[16:20])[0]))
         elif data[i] == 3:
-            x["co2"] = "{:.2f}".format(struct.unpack('f', data[16:20])[0])
+            x["co2"] = struct.unpack('f', data[16:20])[0]
         elif data[i] == 4:
-            x["surf_temp"] = "{:.2f}".format(struct.unpack('f', data[26:30])[0])
+            x["surf_temp"] = float("{:.2f}".format(struct.unpack('f', data[26:30])[0]))
         elif data[i] == 5:
-            x["abs_humidity"] = "{:.2f}".format(struct.unpack('f', data[6:10])[0])        
+            x["abs_humidity"] = float("{:.2f}".format(struct.unpack('f', data[6:10])[0]))        
         elif data[i] == 7:
-            x["movement"] = struct.unpack('f', data[6:10])[0]
-        elif data[i] == 10:
-            x["add_temp"] = "{:.2f}".format(struct.unpack('f', data[21:25])[0])
+            x["movement"] = float("{:.2f}".format(struct.unpack('f', data[6:10])[0]))  
+        elif data[i] == 10: #documentation is marked as 9, arduino sends by 10
+            x["add_temp"] = float("{:.2f}".format(struct.unpack('f', data[21:25])[0]))
         elif data[i] == 11:
-            x["noise"] = "{:.2f}".format(struct.unpack('f', data[6:10])[0])           
-    return(x)
+            x["noise"] = float("{:.2f}".format(struct.unpack('f', data[6:10])[0]))
+        document["data"] = x
+        data_json = json.dumps(document)    
+    return(data_json)
 
 if __name__ == "__main__":
     main()
