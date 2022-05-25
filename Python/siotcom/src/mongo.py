@@ -1,6 +1,10 @@
+#Local imports
+
+#External imports
 import pymongo
 from pymongo.errors import ConnectionFailure
 
+#Global Config
 MONGO_URI = "mongodb://127.0.0.1:27017/"  # mongodb://ip:port
 MONGO_DB = "SIoTCom"
 MONGO_COLLECTION = "sensor"
@@ -17,7 +21,7 @@ class Mongo():
         self.collection = self.database[MONGO_COLLECTION]
         print("Connecting")
 
-    def onConnect(self):
+    def on_Connect(self):
         if self.client:
             try:
                 # The ismaster command does not require auth
@@ -34,11 +38,13 @@ class Mongo():
             self.client = None
         print("Disconnected")
     
-    def store(self, msg):
+    def save(self, msg):
         print("Storing data")
-        try:
-            result = self.collection.insert_one(msg)
-            print("Saved document with id ", result.inserted_id)
-        except Exception as ex:
-            print(ex)
-
+        if self.on_Connect():
+            try:
+                result = self.collection.insert_one(msg)
+                print("Saved document with id ", result.inserted_id)
+            except Exception as ex:
+                print(ex)
+        else:
+            print("Could not store data")
