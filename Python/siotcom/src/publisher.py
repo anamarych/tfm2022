@@ -2,15 +2,29 @@
 
 # 2022 SYST, Universidad Politecnica de Madrid
 # SIoTCom
-# @File : readserial.py
+# @File : publisher.py
 # @Author : a.cvillasenor@alumnos.upm.es
+# This takes data from source and acts only as a publisher
 
+#Local imports
+from mqtt import MQTT
+
+#External imports
 import struct
 import serial
 import math
 import datetime
+import sys
+
+#Global Config
+MQTT_CLIENT_ID = 'PUBLISH_CLIENT'
+CLASS_ID = "4405"
+HUB_ID = "000FF001"
 
 def main():
+    mqtt = MQTT(MQTT_CLIENT_ID)
+    mqtt.run()
+    
     ser = serial.Serial(
         port = '/dev/ttyS0',
         baudrate = 9600,
@@ -20,19 +34,23 @@ def main():
         )
     read_serial(ser)
     
-def read_serial(serial):
-    
+def read_serial(serial): 
     while 1:
-        buffer = serial.read_until(expected=b'\r\n')
-        f_data = format_sensor(buffer)
+        try:
+            buffer = serial.read_until(expected=b'\r\n')
+            f_data = format_sensor(buffer)
+            mqtt.do_publish(f_data)
+        except KeyboardInterrupt:
+            mqtt.stop()
+            sys.exit(0)
     
 def format_sensor(data):
-    now = datetime.datetime.now().isoformat()
+    now = datetime.datetime.now().isoformat() #MongoDB format
     mota = str(int.from_bytes(data[1:4], "big"))
     document = {
         "time" : now,
-        "class": "4405",
-        "hub": "000FF001",
+        "class": CLASS_ID,
+        "hub": HUB_ID,
         "node": mota
         }
     x = {}
