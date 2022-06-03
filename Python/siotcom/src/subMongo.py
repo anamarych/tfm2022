@@ -13,7 +13,7 @@ from mqtt import MQTT
 
 
 #Global Config
-MQTT_CLIENT_ID = 'SUB_CLIENT'
+MQTT_CLIENT_ID = 'MONGO_CLIENT'
 CLASS_ID = "4405"
 HUB_ID = "000FF001"
 MQTT_TOPIC =("4405/000FF001/sensores")
