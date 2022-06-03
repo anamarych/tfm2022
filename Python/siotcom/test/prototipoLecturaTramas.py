@@ -24,6 +24,9 @@ sys.path.append(a)
 
 from siotcom.src.mongo import Mongo
 
+CLASS_ID = "4405"
+HUB_ID = "000FF001"
+
 def main():
     mongo = Mongo()
     mongo.connect()
@@ -53,8 +56,8 @@ def format_sensor(data):
     mota = str(int.from_bytes(data[1:4], "big"))
     document = {
         "time" : now,
-        "class": "4405",
-        "hub": "000FF001",
+        "class": CLASS_ID,
+        "hub": HUB_ID,
         "node": mota
         }
     
