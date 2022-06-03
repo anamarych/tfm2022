@@ -8,6 +8,7 @@
 
 #Local imports
 from mqtt import MQTT
+import json
 
 #External imports
 import struct
@@ -17,6 +18,7 @@ import datetime
 import sys
 
 #Global Config
+MQTT_TOPIC = "4405/000FF001/sensores" #formato {aula}/{concentrador}/sensores/{mota}
 MQTT_CLIENT_ID = 'PUBLISH_CLIENT'
 CLASS_ID = "4405"
 HUB_ID = "000FF001"
@@ -32,14 +34,14 @@ def main():
         stopbits = serial.STOPBITS_ONE,
         bytesize = serial.EIGHTBITS,
         )
-    read_serial(ser)
+    read_serial(ser, mqtt)
     
 def read_serial(serial): 
     while 1:
         try:
             buffer = serial.read_until(expected=b'\r\n')
-            f_data = format_sensor(buffer)
-            mqtt.do_publish(f_data)
+            f_data, topic = format_sensor(buffer)
+            mqtt.publish(topic, f_data)
         except KeyboardInterrupt:
             mqtt.stop()
             sys.exit(0)
@@ -47,6 +49,7 @@ def read_serial(serial):
 def format_sensor(data):
     now = datetime.datetime.now().isoformat() #MongoDB format
     mota = str(int.from_bytes(data[1:4], "big"))
+    topic = MQTT_TOPIC + "/" + mota
     document = {
         "time" : now,
         "class": CLASS_ID,
@@ -79,7 +82,7 @@ def format_sensor(data):
             x["noise"] = float("{:.2f}".format(struct.unpack('f', data[6:10])[0]))
         document["data"] = x
         data_json = json.dumps(document)    
-    return(data_json)
+    return(data_json, topic)
 
 if __name__ == "__main__":
     main()
