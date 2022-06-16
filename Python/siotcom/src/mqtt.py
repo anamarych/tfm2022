@@ -7,7 +7,7 @@ MQTT_HOST = "localhost" # este concentrador funciona como broker
 MQTT_PORT = 1883 #puerto default
 MQTT_KEEPALIVE = 60
 MQTT_QOS = 2 #comprobar que no se cierre la sesion con este QoS
-MQTT_TOPIC = ("4405/000FF001/sensores") #formato aula/concentrador/sensores
+MQTT_TOPIC = "4405/000FF001/sensores" #formato aula/concentrador/sensores
 #topic de todas las motas en este aula y concentrador "4405/000FF001/sensores"
 
 class MQTT():

@@ -2,6 +2,7 @@
 
 #External imports
 import pymongo
+import json
 from pymongo.errors import ConnectionFailure
 
 #Global Config
@@ -42,7 +43,7 @@ class Mongo():
         print("Storing data")
         if self.on_Connect():
             try:
-                result = self.collection.insert_one(msg)
+                result = self.collection.insert_one(json.loads(msg))
                 print("Saved document with id ", result.inserted_id)
             except Exception as ex:
                 print(ex)

@@ -22,6 +22,7 @@ MQTT_TOPIC = "4405/000FF001/sensores" #formato {aula}/{concentrador}/sensores/{m
 MQTT_CLIENT_ID = 'PUBLISH_CLIENT'
 CLASS_ID = "4405"
 HUB_ID = "000FF001"
+EXPECTED_DATA_LENGTH = [12, 22, 32]
 
 def main():
     mqtt = MQTT(MQTT_CLIENT_ID)
@@ -40,12 +41,28 @@ def read_serial(serial):
     while 1:
         try:
             buffer = serial.read_until(expected=b'\r\n')
-            f_data, topic = format_sensor(buffer)
-            mqtt.publish(topic, f_data)
+            if len(buffer) in EXPECTED_DATA_LENGTH:
+                data, topic = format_sensor(buffer)
+            else:
+                data, topic = format_error(buffer)
+            mqtt.publish(topic, data)
         except KeyboardInterrupt:
             mqtt.stop()
             sys.exit(0)
     
+def format_error(data):
+    now = datetime.datetime.now().isoformat() #MongoDB format
+    topic = MQTT_TOPIC + "/issue"
+    document = {
+        "time" : now,
+        "class": CLASS_ID,
+        "hub": HUB_ID,
+        "node": "unknown",
+        "data": {"error": data.decode("utf-8")}
+        }
+    data_json = json.dumps(document)    
+    return(data_json, topic)
+
 def format_sensor(data):
     now = datetime.datetime.now().isoformat() #MongoDB format
     mota = str(int.from_bytes(data[1:4], "big"))
