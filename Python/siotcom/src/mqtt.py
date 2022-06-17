@@ -6,12 +6,11 @@ import paho.mqtt.client as mqtt
 MQTT_HOST = "localhost" # este concentrador funciona como broker
 MQTT_PORT = 1883 #puerto default
 MQTT_KEEPALIVE = 60
-MQTT_QOS = 2 #comprobar que no se cierre la sesion con este QoS
 MQTT_TOPIC = "4405/000FF001/sensores" #formato aula/concentrador/sensores
 #topic de todas las motas en este aula y concentrador "4405/000FF001/sensores"
 
 class MQTT():
-    def __init__(self, client_id):
+    def __init__(self, client_id, mongo: Mongo = None):
         self.mongo: Mongo = mongo #This is only used on mongo subscriber
         self.mqtt_client = mqtt.Client(client_id) #create client
         self.mqtt_client.on_connect = self.on_connect #on_connect callback
@@ -22,7 +21,7 @@ class MQTT():
         print("Connected to Mosquitto")
         
     def on_message(self, client: mqtt.Client, data, msg: mqtt.MQTTMessage):
-        self.mongo.save(msg.payload) #binary format?
+        self.mongo.save(msg.payload)
     
     def on_publish(self, client: mqtt.Client, data, mid):
         print("Published ", mid)
