@@ -4,26 +4,24 @@
 # SIoTCom
 # @File : subAzure.py
 # @Author : a.cvillasenor@alumnos.upm.es
-# This takes data from source and acts as the Azure subscriber. Writes msgs to Azure IOTHUB
+# This is the subscriber for Azure IoTHub
 
 #Local imports
+from azureBase import AzureBase
 from mqtt import MQTT
 
-#External imports
-
 #Global Config
+CONNECTION_STRING = os.getenv("IOTHUB_DEVICE_CONNECTION_STRING")
 MQTT_CLIENT_ID = 'AZURE_CLIENT'
-CLASS_ID = "4405"
-HUB_ID = "000FF001"
 MQTT_TOPIC =("4405/000FF001/sensores/#")
+logging.basicConfig(level=logging.ERROR)
 
 def main():
-    try:
-        mqtt = MQTT(MQTT_CLIENT_ID)
-        mqtt.run()
-        mqtt.subscribe(MQTT_TOPIC)
-    except KeyboardInterrupt:
-        mqtt.stop()
+    az = AzureBase()
+    mqtt = MQTT(MQTT_CLIENT_ID, None, az)
+    az.connect()
+    mqtt.run()
+    mqtt.subscribe(MQTT_TOPIC, 2)
 
 if __name__ == "__main__":
     main()
