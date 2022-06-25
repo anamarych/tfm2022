@@ -7,15 +7,12 @@
 # This takes data from source and acts as the MongoDB subscriber. Writes msgs to DB
 
 #Local imports
-from mqtt import MQTT
 from mongo import Mongo
+from mqtt import MQTT
 
 #External imports
-
 #Global Config
 MQTT_CLIENT_ID = 'MONGO_CLIENT'
-CLASS_ID = "4405"
-HUB_ID = "000FF001"
 MQTT_TOPIC =("4405/000FF001/sensores/#")
 
 def main():
