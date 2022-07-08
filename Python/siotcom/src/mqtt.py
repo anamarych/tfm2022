@@ -34,7 +34,7 @@ class MQTT():
         else:
             print("Failed to connect to Mosqutito")
     
-    def on_disconnect(self, client:mqtt.Client, userdata, rc=0)
+    def on_disconnect(self, client:mqtt.Client, userdata, rc=0):
         print("Disconnected from Mosquitto")
         
     def on_message(self, client: mqtt.Client, userdata, msg):
