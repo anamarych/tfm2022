@@ -11,20 +11,25 @@ from mongo import Mongo
 from mqtt import MQTT
 
 #External imports
+from signal import pause
+import sys
+
 #Global Config
 MQTT_CLIENT_ID = 'MONGO_CLIENT'
 MQTT_TOPIC =("4405/000FF001/sensores/#")
 
 def main():
+    mongo = Mongo()
+    mqtt = MQTT(MQTT_CLIENT_ID, mongo)
+    mqtt.run()
+    mongo.connect()
+    mqtt.subscribe(MQTT_TOPIC)
     try:
-        mongo = Mongo()
-        mqtt = MQTT(MQTT_CLIENT_ID, mongo)
-        mongo.connect()
-        mqtt.run()
-        mqtt.subscribe(MQTT_TOPIC)
+        pause()
     except KeyboardInterrupt:
-        mqtt.stop()
         mongo.disconnect()
+        mqtt.stop()
+        sys.exit(0)
 
 if __name__ == "__main__":
     main()

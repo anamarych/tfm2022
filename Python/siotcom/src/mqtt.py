@@ -25,10 +25,17 @@ class MQTT():
         self.mqtt_client = mqtt.Client(client_id) #create client
         self.mqtt_client.on_connect = self.on_connect #on_connect callback
         self.mqtt_client.on_message = self.on_message #on_message callback
-        self.mqtt_client.on_publish = self.on_publish #on_message callback
+        self.mqtt_client.on_publish = self.on_publish #on_publish callback
+        self.mqtt_client.on_disconnect = self.on_disconnect #on_disconnect callback
 
     def on_connect(self, client:mqtt.Client, userdata, flags, rc):
-        print("Connected to Mosquitto")
+        if rc == 0:
+            print("Connected to Mosquitto")
+        else:
+            print("Failed to connect to Mosqutito")
+    
+    def on_disconnect(self, client:mqtt.Client, userdata, rc=0)
+        print("Disconnected from Mosquitto")
         
     def on_message(self, client: mqtt.Client, userdata, msg):
         if self.mongo is not None:
@@ -44,7 +51,7 @@ class MQTT():
     
     def subscribe(self, topic, qos):
         self.mqtt_client.subscribe(topic, qos)
-        print("Suscribed")
+        print("Suscribed to ", topic)
     
     def run(self):
         self.mqtt_client.connect(MQTT_HOST, MQTT_PORT, MQTT_KEEPALIVE)
