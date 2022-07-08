@@ -30,16 +30,16 @@ class AzureBase():
         # Connect the client
         self.client = IoTHubDeviceClient.create_from_connection_string(CONNECTION_STRING) #product_info=model_id)
         self.client.connect()
-        print("Connected")
+        print("Connected to IoTHub")
     
     def disconnect(self):
         self.client.shutdown()
-        print("Disconnected")
+        print("Disconnected from IoTHub")
         
     def send_data(self, data):
         msg = Message(data)
         msg.content_encoding = "utf-8"
         msg.content_type = "application/json"
-        print("message sent")
+        print("Message sent to IoTHub")
         self.client.send_message(msg)
         

@@ -10,11 +10,13 @@
 from azureBase import AzureBase
 from mqtt import MQTT
 
+#External imports
+from singal import pause
+import sys
+
 #Global Config
-CONNECTION_STRING = os.getenv("IOTHUB_DEVICE_CONNECTION_STRING")
 MQTT_CLIENT_ID = 'AZURE_CLIENT'
 MQTT_TOPIC =("4405/000FF001/sensores/#")
-logging.basicConfig(level=logging.ERROR)
 
 def main():
     az = AzureBase()
@@ -22,6 +24,12 @@ def main():
     az.connect()
     mqtt.run()
     mqtt.subscribe(MQTT_TOPIC, 2)
+    try:
+        pause()
+    except KeyboardInterrupt:
+        az.disconnect()
+        mqtt.stop()
+        sys.exit(0)
 
 if __name__ == "__main__":
     main()

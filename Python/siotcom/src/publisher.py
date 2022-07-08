@@ -18,11 +18,12 @@ import datetime
 import sys
 
 #Global Config
-MQTT_TOPIC = "4405/000FF001/sensores" #formato {aula}/{concentrador}/sensores/{mota}
-MQTT_CLIENT_ID = 'PUBLISH_CLIENT'
 CLASS_ID = "4405"
 HUB_ID = "000FF001"
 EXPECTED_DATA_LENGTH = [12, 22, 32]
+MQTT_CLIENT_ID = 'PUBLISH_CLIENT'
+MQTT_TOPIC = "4405/000FF001/sensores" #formato {aula}/{concentrador}/sensores/{mota}
+MQTT_TOPIC_COMMANDS = "4405/000FF001/actuadores/#" #formato {aula}/{concentrador}/actuadores/{motadestino}
 
 def main():
     mqtt = MQTT(MQTT_CLIENT_ID)
@@ -80,23 +81,23 @@ def format_sensor(data):
 
     for i in range(5,len(data),5):
         if data[i] == 0:
-            x["room_temp"] = float("{:.2f}".format(struct.unpack('f', data[11:15])[0]))
+            x["room_temp"] = float("{:-.2f}".format(struct.unpack('f', data[11:15])[0]))
         elif data[i] == 1:
-            x["humidity"] = float("{:.2f}".format(struct.unpack('f', data[6:10])[0]))
+            x["humidity"] = float("{:-.2f}".format(struct.unpack('f', data[6:10])[0]))
         elif data[i] == 2:
-            x["luminosity"] = float("{:.2f}".format(struct.unpack('f', data[16:20])[0]))
+            x["luminosity"] = float("{:-.2f}".format(struct.unpack('f', data[16:20])[0]))
         elif data[i] == 3:
-            x["co2"] = struct.unpack('f', data[16:20])[0]
+            x["co2"] = float("{:-.2f}".format(struct.unpack('f', data[16:20])[0]))
         elif data[i] == 4:
-            x["surf_temp"] = float("{:.2f}".format(struct.unpack('f', data[26:30])[0]))
+            x["surf_temp"] = float("{:-.2f}".format(struct.unpack('f', data[26:30])[0]))
         elif data[i] == 5:
-            x["abs_humidity"] = float("{:.2f}".format(struct.unpack('f', data[6:10])[0]))        
+            x["abs_humidity"] = float("{:-.2f}".format(struct.unpack('f', data[6:10])[0]))        
         elif data[i] == 7:
-            x["movement"] = float("{:.2f}".format(struct.unpack('f', data[6:10])[0]))  
+            x["movement"] = float("{:-.2f}".format(struct.unpack('f', data[6:10])[0]))  
         elif data[i] == 10: #documentation is marked as 9, arduino sends by 10
-            x["add_temp"] = float("{:.2f}".format(struct.unpack('f', data[21:25])[0]))
+            x["add_temp"] = float("{:-.2f}".format(struct.unpack('f', data[21:25])[0]))
         elif data[i] == 11:
-            x["noise"] = float("{:.2f}".format(struct.unpack('f', data[6:10])[0]))
+            x["noise"] = float("{:-.2f}".format(struct.unpack('f', data[6:10])[0]))
         document["data"] = x
         data_json = json.dumps(document)    
     return(data_json, topic)
