@@ -1,13 +1,21 @@
-#Local imports
+#!/usr/bin/env python
 
-#External imports
+# 2022 SYST, Universidad Politecnica de Madrid
+# SIoTCom
+# @File : mongo.py
+# @Author : a.cvillasenor@alumnos.upm.es
+# This takes data from source and connects to MongoDB
+
+# Local imports
+
+# External imports
 import pymongo
 import json
 from pymongo.errors import ConnectionFailure
 
 #Global Config
-MONGO_URI = "mongodb://127.0.0.1:27017/"  # mongodb://ip:port
-MONGO_DB = "SIoTCom"
+MONGO_URI = "mongodb://127.0.0.1:27017/"  # mongodb://ip:port if connecting remotely
+MONGO_DB = "siotcom"
 MONGO_COLLECTION = "sensor"
 
 class Mongo():
@@ -20,7 +28,7 @@ class Mongo():
         self.client = pymongo.MongoClient(MONGO_URI)
         self.database = self.client[MONGO_DB]
         self.collection = self.database[MONGO_COLLECTION]
-        print("Connecting")
+        print("Connecting to MongoDB")
 
     def on_Connect(self):
         if self.client:
@@ -37,10 +45,9 @@ class Mongo():
         if self.client:
             self.client.close()
             self.client = None
-        print("Disconnected")
+        print("Disconnected from MongoDB")
     
     def save(self, msg):
-        print("Storing data")
         if self.on_Connect():
             try:
                 result = self.collection.insert_one(json.loads(msg))
@@ -48,4 +55,4 @@ class Mongo():
             except Exception as ex:
                 print(ex)
         else:
-            print("Could not store data")
+            print("Could not store data in MongoDB")

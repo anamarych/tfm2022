@@ -17,12 +17,13 @@ import math
 import datetime
 import sys
 
-# Global Config
-MQTT_TOPIC = "4405/000FF001/sensores" #formato {aula}/{concentrador}/sensores/{mota}
-MQTT_CLIENT_ID = 'PUBLISH_CLIENT'
+#Global Config
 CLASS_ID = "4405"
 HUB_ID = "000FF001"
 EXPECTED_DATA_LENGTH = [12, 22, 32]
+MQTT_CLIENT_ID = 'PUBLISH_CLIENT'
+MQTT_TOPIC = "4405/000FF001/sensores" #formato {aula}/{concentrador}/sensores/{mota}
+MQTT_TOPIC_COMMANDS = "4405/000FF001/actuadores/#" #formato {aula}/{concentrador}/actuadores/{motadestino}
 
 def main():
     mqtt = MQTT(MQTT_CLIENT_ID)
@@ -92,7 +93,7 @@ def format_sensor(data):
             x["abs_humidity"] = float("{:-.2f}".format(struct.unpack('f', data[6:10])[0]))        
         elif data[i] == 7:
             x["movement"] = float("{:-.2f}".format(struct.unpack('f', data[6:10])[0]))  
-        elif data[i] == 10:
+        elif data[i] == 10: #documentation is marked as 9, arduino sends by 10
             x["add_temp"] = float("{:-.2f}".format(struct.unpack('f', data[21:25])[0]))
         elif data[i] == 11:
             x["noise"] = float("{:-.2f}".format(struct.unpack('f', data[6:10])[0]))
