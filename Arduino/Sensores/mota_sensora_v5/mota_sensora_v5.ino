@@ -30,9 +30,9 @@ void setup() {
 
 void datos(int nSensors) {
   data[0] = 0;//Trama medidas de los sensores
-  data[1] = 2;//Regleta I
+  data[1] = 2;//Regleta
   data[2] = 1;//Tipo mota sensora
-  data[3] = 5;//Mota III
+  data[3] = 5;//Mota
   data[4] = nSensors;//5 Sensores(Son 3 pero toman mas de una medida)
 }
 
