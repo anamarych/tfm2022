@@ -1,0 +1,28 @@
+En este concentrador es necesario iniciar mosquitto. Inicia automatico, para verificar el servicio utiliza: sudo service mosquitto status
+
+Para configurar el publicador se deben modificar los archivos:
+
+mqtt.py:
+MQTT_HOST = "localhost" # este concentrador funciona como broker
+
+publisher.py:
+CLASS_ID = "4405" # Debe ser el aula objetivo
+HUB_ID = "000FF001" # Es el ID de este concentrador
+MQTT_CLIENT_ID = 'PUBLISH_CLIENT' # ID unico para publicar en mosquitto
+MQTT_TOPIC = "4405/000FF001/sensores" #formato {aula}/{concentrador}/sensores/{mota}
+
+subMongo.py:
+MQTT_TOPIC =["4405/000FF001/sensores/#", "4007/000FF002/sensores/#"] #Debe existir un topic por cada concentrador existente
+
+mongo.py
+MONGO_URI = "mongodb://ip:port/"  # Ubicacion de la base de datos Mongo
+MONGO_DB = "siotcom" #nombre de la base de datos
+MONGO_COLLECTION = "sensor" #nombre de la coleccion
+
+Para iniciar el publisher:
+cd Documents/siotcom/src/
+python publisher.py
+
+Para iniciar la subida de datos a mongoDB:
+cd Documents/siotcom/src/
+python subMongo.py

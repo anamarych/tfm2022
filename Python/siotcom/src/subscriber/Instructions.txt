@@ -1,0 +1,18 @@
+En este concentrador no es necesario iniciar mosquitto, incluso puede no existir.
+No insertamos directamente en mongoDB por lo que no es necesario un subscriber que
+lo haga y por ende sus dependencias se eliminan del archivo mqtt.py
+
+Para configurar el publicador remoto se deben modificar los archivos:
+
+mqtt.py:
+MQTT_HOST = "#.#.#.#" # Debe tener como host la IP del broker y no localhost
+
+publisher.py:
+CLASS_ID = "4007" # Debe ser el aula objetivo
+HUB_ID = "000FF002" # Es el ID de este concentrador
+MQTT_CLIENT_ID = 'PUBLISH_CLIENT2' # ID unico para publicar en mosquitto
+MQTT_TOPIC = "4007/000FF002/sensores" #formato {aula}/{concentrador}/sensores/{mota}
+
+Para iniciar el publisher:
+cd Documents/siotcom/src/
+python publisher.py

@@ -1,0 +1,3 @@
+Para ejecutar el codigo sin problema, se debe sobreescribir los archivos necesarios dependiendo 
+si la raspberry corresponde a un broker o no y verificar las ip que indican la conexion a mongoDB 
+en caso del broker y a mosquitto en caso de subscriber

@@ -22,15 +22,17 @@ a=str(path.parent.absolute())
 
 sys.path.append(a)
 
-from siotcom.src.mongo import Mongo
+from mqtt import MQTT # puede dar error dependiendo de la estructura del proyecto
 
-CLASS_ID = "TEST_CLASS"
-HUB_ID = "TEST_HUB"
+CLASS_ID = "4407"
+HUB_ID = "000FF002"
 EXPECTED_DATA_LENGTH = [10, 20, 30]
+MQTT_CLIENT_ID = 'PUBLISH_CLIENT2'
+MQTT_TOPIC = "4007/000FF002/sensores" #formato {aula}/{concentrador}/sensores/{mota}
 
 def main():
-    #mongo = Mongo()
-    #mongo.connect()
+    mqtt = MQTT(MQTT_CLIENT_ID)
+    mqtt.run()
 
     #ejemplos de tramas obtenidas
     multi_buffer = [
@@ -48,15 +50,14 @@ def main():
         ]
 
     #cambiar buffer por la trama deseada para extraer la informacion
-    buffer = multi_buffer[0]
+    buffer = multi_buffer[1]
     print(buffer)
     if len(buffer) in EXPECTED_DATA_LENGTH:
-        f_data = format_sensor(buffer)
+        data, topic = format_sensor(buffer)
     else:
-        f_data = format_error(buffer)
-    print(f_data)
-    #mongo.save(f_data)
-    #mongo.disconnect()
+        data, topic = format_error(buffer)
+    print(data)
+    mqtt.publish(topic, data)
 
 def format_error(data):
     now = datetime.datetime.now().isoformat() #MongoDB format
@@ -72,6 +73,7 @@ def format_error(data):
 def format_sensor(data):
     now = datetime.datetime.now().isoformat()
     mota = str(int.from_bytes(data[1:4], "big"))
+    topic = MQTT_TOPIC + "/" + mota
     
     document = {
         "time" : now,
@@ -104,8 +106,9 @@ def format_sensor(data):
             x["add_temp"] = float("{:.2f}".format(struct.unpack('f', data[21:25])[0]))
         elif data[i] == 11:
             x["noise"] = float("{:.2f}".format(struct.unpack('f', data[6:10])[0]))
-        document["data"] = x   
-    return(document)
+        document["data"] = x
+        data_json = json.dumps(document)    
+    return(data_json,topic)
 
 if __name__ == "__main__":
     main()
